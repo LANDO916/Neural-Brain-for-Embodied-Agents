@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orpheum - Dream Engine</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/orpheum.css') }}">
+</head>
+<body>
+    <div id="orpheum-container">
+        <canvas id="dream-canvas"></canvas>
+        
+        <div class="interface">
+            <div class="header">
+                <h1 class="logo">ORPHEUM</h1>
+                <div class="status" id="status">AWAITING INPUT</div>
+            </div>
+            
+            <div class="data-panel">
+                <div class="data-field">
+                    <span class="label">EMOTION</span>
+                    <span class="value" id="emotion">—</span>
+                </div>
+                <div class="data-field">
+                    <span class="label">VALENCE</span>
+                    <span class="value" id="valence">0.00</span>
+                </div>
+                <div class="data-field">
+                    <span class="label">AROUSAL</span>
+                    <span class="value" id="arousal">0.00</span>
+                </div>
+                <div class="data-field">
+                    <span class="label">NODE</span>
+                    <span class="value" id="node">INIT</span>
+                </div>
+            </div>
+            
+            <div class="observation" id="observation"></div>
+            
+            <div class="controls">
+                <input type="file" id="audio-input" accept="audio/*" style="display: none;">
+                <button class="upload-btn" onclick="document.getElementById('audio-input').click()">
+                    LOAD AUDIO
+                </button>
+            </div>
+        </div>
+        
+        <div class="neural-grid" id="neural-grid"></div>
+    </div>
+    
+    <script src="{{ url_for('static', filename='lib/three.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='lib/socket.io.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/orpheum.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/visualizer.js') }}"></script>
+</body>
+</html>

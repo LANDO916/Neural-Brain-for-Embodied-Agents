@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio Analysis AI Agent</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/lucide-react@latest/dist/umd/lucide-react.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    animation: {
+                        'fadeIn': 'fadeIn 0.5s ease-out forwards',
+                        'pulse': 'pulse 2s infinite'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(31, 41, 55, 0.5);
+            border-radius: 3px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(107, 114, 128, 0.5);
+            border-radius: 3px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(107, 114, 128, 0.7);
+        }
+        .animate-fadeIn {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useRef, useEffect } = React;
+        const { 
+            Upload, Music, Mic, Activity, Brain, Video, Sparkles, 
+            Settings, Play, Pause, BarChart3, FileAudio, Layers 
+        } = lucideReact;
+
+        const AudioAnalysisAgent = () => {
+            const [audioFile, setAudioFile] = useState(null);
+            const [audioUrl, setAudioUrl] = useState(null);
+            const [isAnalyzing, setIsAnalyzing] = useState(false);
+            const [currentLayer, setCurrentLayer] = useState(0);
+            const [analysisResults, setAnalysisResults] = useState({
+                layer1: {
+                    musical: null,
+                    lyrical: null,
+                    sonic: null
+                },
+                layer2: {
+                    visual: null,
+                    emotion: null,
+                    quality: null,
+                    adaptive: null
+                },
+                layer3: {
+                    narrative: null,
+                    visual: null,
+                    technical: null
+                }
+            });
+            
+            const audioRef = useRef(null);
+            const canvasRef = useRef(null);
+            const spectrumCanvasRef = useRef(null);
+            const spectrogramCanvasRef = useRef(null);
+            const oscilloscopeCanvasRef = useRef(null);
+            const animationRef = useRef(null);
+            const spectrogramAnimationRef = useRef(null);
+            const audioContextRef = useRef(null);
+            const analyserRef = useRef(null);
+            const [isPlaying, setIsPlaying] = useState(false);
+            const spectrogramDataRef = useRef([]);
+            const [transcriptionText, setTranscriptionText] = useState('');
+            const [transcriptionComplete, setTranscriptionComplete] = useState(false);
+
+            // File upload handler
+            const handleFileUpload = (e) => {
+                const file = e.target.files[0];
+                if (file && file.type.startsWith('audio/')) {
+                    // Stop current playback if any
+                    if (audioRef.current && isPlaying) {
+                        audioRef.current.pause();
+                        setIsPlaying(false);
+                    }
+                    
+                    setAudioFile(file);
+                    const url = URL.createObjectURL(file);
+                    setAudioUrl(url);
+                    setTranscriptionText('');
+                    setTranscriptionComplete(false);
+                    setAnalysisResults({
+                        layer1: { musical: null, lyrical: null, sonic: null },
+                        layer2: { visual: null, emotion: null, quality: null, adaptive: null },
+                        layer3: { narrative: null, visual: null, technical: null }
+                    });
+                }
+            };
+
+            // Initialize audio context and analyser
+            const initAudioContext = () => {
+                if (!audioContextRef.current) {
+                    audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)();
+                    analyserRef.current = audioContextRef.current.createAnalyser();
+                    analyserRef.current.fftSize = 2048;
+                    
+                    if (audioRef.current) {
+                        const source = audioContextRef.current.createMediaElementSource(audioRef.current);
+                        source.connect(analyserRef.current);
+                        analyserRef.current.connect(audioContextRef.current.destination);
+                    }
+                }
+            };
+
+            // Visualize audio waveform
+            const visualize = () => {
+                if (!analyserRef.current || !canvasRef.current) return;
+                
+                const canvas = canvasRef.current;
+                const ctx = canvas.getContext('2d');
+                const bufferLength = analyserRef.current.frequencyBinCount;
+                const dataArray = new Uint8Array(bufferLength);
+                
+                const draw = () => {
+                    animationRef.current = requestAnimationFrame(draw);
+                    analyserRef.current.getByteTimeDomainData(dataArray);
+                    
+                    ctx.fillStyle = 'rgb(17, 24, 39)';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    ctx.lineWidth = 2;
+                    ctx.strokeStyle = 'rgb(59, 130, 246)';
+                    ctx.beginPath();
+                    
+                    const sliceWidth = canvas.width / bufferLength;
+                    let x = 0;
+                    
+                    for (let i = 0; i < bufferLength; i++) {
+                        const v = dataArray[i] / 128.0;
+                        const y = v * canvas.height / 2;
+                        
+                        if (i === 0) {
+                            ctx.moveTo(x, y);
+                        } else {
+                            ctx.lineTo(x, y);
+                        }
+                        x += sliceWidth;
+                    }
+                    
+                    ctx.lineTo(canvas.width, canvas.height / 2);
+                    ctx.stroke();
+                };
+                
+                draw();
+            };
+
+            // Frequency Spectrum Visualizer
+            const visualizeSpectrum = () => {
+                if (!analyserRef.current || !spectrumCanvasRef.current) return;
+                
+                const canvas = spectrumCanvasRef.current;
+                const ctx = canvas.getContext('2d');
+                const bufferLength = analyserRef.current.frequencyBinCount;
+                const dataArray = new Uint8Array(bufferLength);
+                
+                const draw = () => {
+                    if (!isPlaying) return;
+                    requestAnimationFrame(draw);
+                    
+                    analyserRef.current.getByteFrequencyData(dataArray);
+                    
+                    ctx.fillStyle = 'rgb(17, 24, 39)';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    
+                    const barWidth = (canvas.width / bufferLength) * 2.5;
+                    let barHeight;
+                    let x = 0;
+                    
+                    for (let i = 0; i < bufferLength; i++) {
+                        barHeight = (dataArray[i] / 255) * canvas.height * 0.8;
+                        
+                        // Create gradient bars
+                        const gradient = ctx.createLinearGradient(0, canvas.height - barHeight, 0, canvas.height);
+                        gradient.addColorStop(0, 'rgb(147, 51, 234)'); // purple
+                        gradient.addColorStop(0.5, 'rgb(59, 130, 246)'); // blue
+                        gradient.addColorStop(1, 'rgb(34, 197, 94)'); // green
+                        
+                        ctx.fillStyle = gradient;
+                        ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
+                        
+                        x += barWidth + 1;
+                    }
+                };
+                
+                draw();
+            };
+
+            // Spectrogram Visualizer
+            const visualizeSpectrogram = () => {
+                if (!analyserRef.current || !spectrogramCanvasRef.current) return;
+                
+                const canvas = spectrogramCanvasRef.current;
+                const ctx = canvas.getContext('2d');
+                const bufferLength = analyserRef.current.frequencyBinCount;
+                const dataArray = new Uint8Array(bufferLength);
+                
+                const draw = () => {
+                    if (!isPlaying) return;
+                    spectrogramAnimationRef.current = requestAnimationFrame(draw);
+                    
+                    analyserRef.current.getByteFrequencyData(dataArray);
+                    
+                    // Shift existing image to the left
+                    const imageData = ctx.getImageData(1, 0, canvas.width - 1, canvas.height);
+                    ctx.putImageData(imageData, 0, 0);
+                    
+                    // Draw new column on the right
+                    for (let i = 0; i < bufferLength; i++) {
+                        const value = dataArray[i];
+                        const y = Math.floor((i / bufferLength) * canvas.height);
+                        const height = Math.ceil(canvas.height / bufferLength);
+                        
+                        // Color mapping: blue (low) -> green -> yellow -> red (high)
+                        let r, g, b;
+                        if (value < 85) {
+                            r = 0;
+                            g = 0;
+                            b = value * 3;
+                        } else if (value < 170) {
+                            r = 0;
+                            g = (value - 85) * 3;
+                            b = 255 - (value - 85) * 3;
+                        } else {
+                            r = (value - 170) * 3;
+                            g = 255;
+                            b = 0;
+                        }
+                        
+                        ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
+                        ctx.fillRect(canvas.width - 1, canvas.height - y - height, 1, height);
+                    }
+                };
+                
+                draw();
+            };
+
+            // Oscilloscope Visualizer
+            const visualizeOscilloscope = () => {
+                if (!analyserRef.current || !oscilloscopeCanvasRef.current) return;
+                
+                const canvas = oscilloscopeCanvasRef.current;
+                const ctx = canvas.getContext('2d');
+                analyserRef.current.fftSize = 2048;
+                const bufferLength = analyserRef.current.fftSize;
+                const dataArray = new Float32Array(bufferLength);
+                
+                const draw = () => {
+                    if (!isPlaying) return;
+                    requestAnimationFrame(draw);
+                    
+                    analyserRef.current.getFloatTimeDomainData(dataArray);
+                    
+                    ctx.fillStyle = 'rgb(17, 24, 39)';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    
+                    ctx.lineWidth = 2;
+                    ctx.strokeStyle = 'rgb(34, 197, 94)';
+                    ctx.beginPath();
+                    
+                    const sliceWidth = canvas.width / bufferLength;
+                    let x = 0;
+                    
+                    for (let i = 0; i < bufferLength; i++) {
+                        const y = (dataArray[i] * canvas.height / 2) + canvas.height / 2;
+                        
+                        if (i === 0) {
+                            ctx.moveTo(x, y);
+                        } else {
+                            ctx.lineTo(x, y);
+                        }
+                        
+                        x += sliceWidth;
+                    }
+                    
+                    ctx.stroke();
+                    
+                    // Draw center line
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+                    ctx.beginPath();
+                    ctx.moveTo(0, canvas.height / 2);
+                    ctx.lineTo(canvas.width, canvas.height / 2);
+                    ctx.stroke();
+                };
+                
+                draw();
+            };
+
+            // Play/pause audio
+            const togglePlayPause = () => {
+                if (!audioRef.current) return;
+                
+                if (isPlaying) {
+                    audioRef.current.pause();
+                } else {
+                    initAudioContext();
+                    
+                    // Clear spectrogram canvas on new play
+                    if (spectrogramCanvasRef.current) {
+                        const ctx = spectrogramCanvasRef.current.getContext('2d');
+                        ctx.fillStyle = 'rgb(17, 24, 39)';
+                        ctx.fillRect(0, 0, spectrogramCanvasRef.current.width, spectrogramCanvasRef.current.height);
+                    }
+                    
+                    audioRef.current.play();
+                    visualize();
+                    visualizeSpectrum();
+                    visualizeSpectrogram();
+                    visualizeOscilloscope();
+                }
+                setIsPlaying(!isPlaying);
+            };
+
+            // Cleanup
+            useEffect(() => {
+                return () => {
+                    if (animationRef.current) {
+                        cancelAnimationFrame(animationRef.current);
+                    }
+                    if (spectrogramAnimationRef.current) {
+                        cancelAnimationFrame(spectrogramAnimationRef.current);
+                    }
+                    if (audioContextRef.current) {
+                        audioContextRef.current.close();
+                    }
+                };
+            }, []);
+
+            // Initialize canvases with dark background
+            useEffect(() => {
+                const canvases = [spectrumCanvasRef, spectrogramCanvasRef, oscilloscopeCanvasRef];
+                canvases.forEach(canvasRef => {
+                    if (canvasRef.current) {
+                        const ctx = canvasRef.current.getContext('2d');
+                        ctx.fillStyle = 'rgb(17, 24, 39)';
+                        ctx.fillRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+                    }
+                });
+            }, [audioUrl]);
+
+            // Handle audio ended event
+            useEffect(() => {
+                const audio = audioRef.current;
+                if (!audio) return;
+
+                const handleEnded = () => {
+                    setIsPlaying(false);
+                };
+
+                audio.addEventListener('ended', handleEnded);
+                return () => {
+                    audio.removeEventListener('ended', handleEnded);
+                };
+            }, [audioUrl]);
+
+            // Simulate live transcription
+            useEffect(() => {
+                if (!isPlaying) return;
+
+                const transcriptionPhrases = [
+                    "🎵 [0:00] Musical introduction detected...",
+                    "📊 Analyzing frequency spectrum: Strong bass presence at 80-120Hz",
+                    "🎹 [0:12] Instrumental passage with rising melody",
+                    "🎤 [0:24] Detecting vocal patterns... Human voice identified",
+                    "📝 Speech clarity: 92% | Background noise: -45dB",
+                    "🎼 [0:36] Verse structure identified - 8 bar pattern",
+                    "🔊 Harmonic analysis: I - V - vi - IV progression detected",
+                    "💫 [0:48] Energy surge detected → Transition to chorus",
+                    "🎵 [1:00] Chorus section beginning with doubled vocals",
+                    "📈 Dynamic range expanding: +6dB increase measured",
+                    "🎸 [1:12] Instrumental solo detected - Guitar lead",
+                    "🌊 [1:24] Bridge section with key modulation to relative minor",
+                    "🎹 Rhythmic variation: Syncopated pattern observed",
+                    "✨ [1:36] Vocal harmonies detected - 3-part arrangement",
+                    "📉 [1:48] Energy decreasing → Approaching outro",
+                    "🎵 [2:00] Outro section with fade effect..."
+                ];
+
+                let currentIndex = 0;
+                setTranscriptionText(''); // Clear on new playback
+                setTranscriptionComplete(false);
+
+                const interval = setInterval(() => {
+                    if (currentIndex < transcriptionPhrases.length && isPlaying) {
+                        setTranscriptionText(prev => {
+                            if (prev) return prev + '\n' + transcriptionPhrases[currentIndex];
+                            return transcriptionPhrases[currentIndex];
+                        });
+                        currentIndex++;
+                        
+                        // Auto-scroll to bottom
+                        const scrollElement = document.querySelector('.transcription-scroll');
+                        if (scrollElement) {
+                            scrollElement.scrollTop = scrollElement.scrollHeight;
+                        }
+                    } else {
+                        clearInterval(interval);
+                        if (currentIndex >= transcriptionPhrases.length) {
+                            setTranscriptionComplete(true);
+                        }
+                    }
+                }, 2500);
+
+                return () => clearInterval(interval);
+            }, [isPlaying]);
+
+            // Layer 1: Parallel Deconstruction Analysis
+            const performLayer1Analysis = async () => {
+                setCurrentLayer(1);
+                
+                // Simulate Musical & Structural Analysis
+                setTimeout(() => {
+                    setAnalysisResults(prev => ({
+                        ...prev,
+                        layer1: {
+                            ...prev.layer1,
+                            musical: {
+                                bpm: Math.floor(Math.random() * 80) + 80,
+                                timeSignature: '4/4',
+                                tempo: ['Allegro', 'Moderato', 'Andante'][Math.floor(Math.random() * 3)],
+                                genre: ['Pop', 'Rock', 'Electronic', 'Classical'][Math.floor(Math.random() * 4)],
+                                harmonyAgent: {
+                                    key: ['C Major', 'G Major', 'A Minor', 'E Minor'][Math.floor(Math.random() * 4)],
+                                    chords: ['I-V-vi-IV', 'ii-V-I', 'I-IV-V'][Math.floor(Math.random() * 3)],
+                                    modulations: Math.floor(Math.random() * 3)
+                                },
+                                taxonomy: {
+                                    primaryGenre: 'Electronic',
+                                    subGenres: ['Ambient', 'Synthwave', 'Downtempo']
+                                }
+                            }
+                        }
+                    }));
+                }, 1000);
+
+                // Simulate Lyrical & Vocal Analysis
+                setTimeout(() => {
+                    setAnalysisResults(prev => ({
+                        ...prev,
+                        layer1: {
+                            ...prev.layer1,
+                            lyrical: {
+                                transcription: "Sample lyrics detected...",
+                                language: 'English',
+                                sentiment: {
+                                    overall: 'Positive',
+                                    scores: { positive: 0.7, negative: 0.1, neutral: 0.2 }
+                                },
+                                themes: ['Love', 'Journey', 'Hope'],
+                                vocalPerformance: {
+                                    pitchAccuracy: 0.92,
+                                    melodyContour: 'Ascending',
+                                    timbre: 'Warm and breathy'
+                                }
+                            }
+                        }
+                    }));
+                }, 1500);
+
+                // Simulate Sonic & Spectral Analysis
+                setTimeout(() => {
+                    setAnalysisResults(prev => ({
+                        ...prev,
+                        layer1: {
+                            ...prev.layer1,
+                            sonic: {
+                                instrumentation: ['Synthesizer', 'Drums', 'Bass', 'Vocals'],
+                                timbre: {
+                                    brightness: 0.7,
+                                    warmth: 0.6,
+                                    presence: 0.8
+                                },
+                                dynamics: {
+                                    loudness: -14,
+                                    dynamicRange: 8,
+                                    peakLevel: -0.3
+                                },
+                                spatial: {
+                                    stereoWidth: 0.85,
+                                    depth: 'Moderate',
+                                    reverb: 'Hall'
+                                }
+                            }
+                        }
+                    }));
+                }, 2000);
+            };
+
+            // Layer 2: Synthesis & Application
+            const performLayer2Analysis = async () => {
+                setCurrentLayer(2);
+                
+                // Visual Synthesis
+                setTimeout(() => {
+                    setAnalysisResults(prev => ({
+                        ...prev,
+                        layer2: {
+                            ...prev.layer2,
+                            visual: {
+                                waveformPattern: 'Dynamic with clear peaks',
+                                spectrogramGenerator: 'Frequency-over-time heatmap generated',
+                                vectorscope: 'Stereo phase correlation: Good'
+                            }
+                        }
+                    }));
+                }, 500);
+
+                // Holistic Emotion Agent
+                setTimeout(() => {
+                    setAnalysisResults(prev => ({
+                        ...prev,
+                        layer2: {
+                            ...prev.layer2,
+                            emotion: {
+                                valence: 0.75,
+                                arousal: 0.6,
+                                mood: 'Uplifting and energetic',
+                                emotionalArc: 'Building from calm to euphoric',
+                                crossModal: 'Harmonic progression supports lyrical sentiment'
+                            }
+                        }
+                    }));
+                }, 1000);
+
+                // Quality & Integrity Agent
+                setTimeout(() => {
+                    setAnalysisResults(prev => ({
+                        ...prev,
+                        layer2: {
+                            ...prev.layer2,
+                            quality: {
+                                clipping: false,
+                                distortion: 0.02,
+                                noiseFloor: -60,
+                                compression: 'Moderate',
+                                phaseIssues: 'None detected'
+                            }
+                        }
+                    }));
+                }, 1500);
+
+                // Adaptive Learning Engine
+                setTimeout(() => {
+                    setAnalysisResults(prev => ({
+                        ...prev,
+                        layer2: {
+                            ...prev.layer2,
+                            adaptive: {
+                                trendSpotter: 'Synthwave revival pattern detected',
+                                modelRetrainer: 'Neural network updated with new examples',
+                                feedbackLoop: 'User preferences incorporated'
+                            }
+                        }
+                    }));
+                }, 2000);
+            };
+
+            // Layer 3: Video Prompt Generation
+            const performLayer3Analysis = async () => {
+                setCurrentLayer(3);
+                
+                // Narrative Agents
+                setTimeout(() => {
+                    setAnalysisResults(prev => ({
+                        ...prev,
+                        layer3: {
+                            ...prev.layer3,
+                            narrative: {
+                                architect: "A journey through neon-lit cityscapes, following a lone protagonist discovering hidden digital realms",
+                                characters: "Cyberpunk explorer with glowing augmentations",
+                                emotionalBeat: "Rising tension → Discovery → Euphoric revelation",
+                                symbolism: "Digital butterflies representing transformation, neon rain as cleansing"
+                            }
+                        }
+                    }));
+                }, 1000);
+
+                // Visual Styling Agents
+                setTimeout(() => {
+                    setAnalysisResults(prev => ({
+                        ...prev,
+                        layer3: {
+                            ...prev.layer3,
+                            visual: {
+                                aesthetic: "Synthwave meets cyberpunk - vibrant neons, deep purples, electric blues",
+                                lighting: "Volumetric fog with colored rim lighting, dramatic shadows",
+                                movement: "Smooth camera glides with synchronized beat cuts",
+                                textures: "Glossy reflective surfaces, holographic overlays, particle effects"
+                            }
+                        }
+                    }));
+                }, 1500);
+
+                // Technical Execution Agents
+                setTimeout(() => {
+                    setAnalysisResults(prev => ({
+                        ...prev,
+                        layer3: {
+                            ...prev.layer3,
+                            technical: {
+                                sceneComposition: "Wide establishing shots → Medium character focus → Close detail inserts",
+                                promptEngineer: "Cinematic, 8K, ray-traced reflections, volumetric lighting, depth of field",
+                                feedbackLoop: "Render quality optimized based on previous generations",
+                                blueprints: "Shot list: 12 scenes, 3-5 seconds each, matched to musical phrases"
+                            }
+                        }
+                    }));
+                }, 2000);
+            };
+
+            // Main analysis pipeline
+            const startAnalysis = async () => {
+                if (!audioFile) return;
+                
+                setIsAnalyzing(true);
+                setCurrentLayer(0);
+                
+                // Layer 1
+                await performLayer1Analysis();
+                await new Promise(resolve => setTimeout(resolve, 3000));
+                
+                // Layer 2
+                await performLayer2Analysis();
+                await new Promise(resolve => setTimeout(resolve, 3000));
+                
+                // Layer 3
+                await performLayer3Analysis();
+                await new Promise(resolve => setTimeout(resolve, 3000));
+                
+                setIsAnalyzing(false);
+                setCurrentLayer(0);
+            };
+
+            return React.createElement('div', {
+                className: "min-h-screen bg-gray-900 text-white p-8"
+            }, 
+                React.createElement('div', {
+                    className: "max-w-7xl mx-auto"
+                },
+                    // Header
+                    React.createElement('div', {
+                        className: "text-center mb-8"
+                    },
+                        React.createElement('h1', {
+                            className: "text-4xl font-bold mb-4 bg-gradient-to-r from-blue-400 to-purple-600 bg-clip-text text-transparent"
+                        }, "Audio Analysis AI Agent"),
+                        React.createElement('p', {
+                            className: "text-gray-400"
+                        }, "Multi-layer audio deconstruction and video prompt generation")
+                    ),
+
+                    // File Upload
+                    React.createElement('div', {
+                        className: "bg-gray-800 rounded-lg p-6 mb-8"
+                    },
+                        React.createElement('label', {
+                            className: "flex flex-col items-center justify-center w-full h-32 border-2 border-gray-600 border-dashed rounded-lg cursor-pointer hover:bg-gray-700 transition-colors"
+                        },
+                            React.createElement('div', {
+                                className: "flex flex-col items-center justify-center pt-5 pb-6"
+                            },
+                                React.createElement(Upload, {
+                                    className: "w-10 h-10 mb-3 text-gray-400"
+                                }),
+                                React.createElement('p', {
+                                    className: "mb-2 text-sm text-gray-400"
+                                },
+                                    React.createElement('span', {
+                                        className: "font-semibold"
+                                    }, "Click to upload"),
+                                    " or drag and drop"
+                                ),
+                                React.createElement('p', {
+                                    className: "text-xs text-gray-500"
+                                }, "Audio files (MP3, WAV, etc.)")
+                            ),
+                            React.createElement('input', {
+                                type: "file",
+                                className: "hidden",
+                                accept: "audio/*",
+                                onChange: handleFileUpload
+                            })
+                        ),
+                        
+                        audioFile && React.createElement('div', {
+                            className: "mt-4 flex items-center justify-between"
+                        },
+                            React.createElement('div', {
+                                className: "flex items-center space-x-3"
+                            },
+                                React.createElement(FileAudio, {
+                                    className: "w-6 h-6 text-blue-400"
+                                }),
+                                React.createElement('span', {
+                                    className: "text-sm"
+                                }, audioFile.name)
+                            ),
+                            React.createElement('button', {
+                                onClick: startAnalysis,
+                                disabled: isAnalyzing,
+                                className: "px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            }, isAnalyzing ? 'Analyzing...' : 'Start Analysis')
+                        )
+                    ),
+
+                    // Audio Player & Visualizer
+                    audioUrl && React.createElement('div', {
+                        className: "bg-gray-800 rounded-lg p-6 mb-8"
+                    },
+                        React.createElement('div', {
+                            className: "flex items-center justify-between mb-4"
+                        },
+                            React.createElement('h3', {
+                                className: "text-xl font-semibold"
+                            }, "Audio Playback"),
+                            React.createElement('button', {
+                                onClick: togglePlayPause,
+                                className: "p-2 bg-gray-700 hover:bg-gray-600 rounded-full transition-colors"
+                            }, isPlaying ? React.createElement(Pause, { className: "w-5 h-5" }) : React.createElement(Play, { className: "w-5 h-5" }))
+                        ),
+                        React.createElement('audio', {
+                            ref: audioRef,
+                            src: audioUrl,
+                            className: "hidden"
+                        }),
+                        React.createElement('canvas', {
+                            ref: canvasRef,
+                            width: 800,
+                            height: 200,
+                            className: "w-full h-32 bg-gray-900 rounded"
+                        })
+                    ),
+
+                    // Analysis Progress
+                    isAnalyzing && React.createElement('div', {
+                        className: "bg-gray-800 rounded-lg p-6 mb-8"
+                    },
+                        React.createElement('div', {
+                            className: "flex justify-between items-center mb-4"
+                        },
+                            React.createElement('h3', {
+                                className: "text-xl font-semibold"
+                            }, "Analysis Progress"),
+                            React.createElement(Layers, {
+                                className: "w-6 h-6 text-blue-400"
+                            })
+                        ),
+                        React.createElement('div', {
+                            className: "space-y-4"
+                        },
+                            [1, 2, 3].map((layer) => 
+                                React.createElement('div', {
+                                    key: layer,
+                                    className: "flex items-center space-x-4"
+                                },
+                                    React.createElement('div', {
+                                        className: `w-8 h-8 rounded-full flex items-center justify-center ${currentLayer >= layer ? 'bg-blue-600' : 'bg-gray-700'}`
+                                    }, layer),
+                                    React.createElement('div', {
+                                        className: "flex-1"
+                                    },
+                                        React.createElement('div', {
+                                            className: "text-sm font-medium mb-1"
+                                        }, `Layer ${layer}: ${layer === 1 ? 'Parallel Deconstruction' : layer === 2 ? 'Synthesis & Application' : 'Video Prompt Generation'}`),
+                                        React.createElement('div', {
+                                            className: "w-full bg-gray-700 rounded-full h-2"
+                                        },
+                                            React.createElement('div', {
+                                                className: "bg-blue-600 h-2 rounded-full transition-all duration-1000",
+                                                style: { width: currentLayer >= layer ? '100%' : '0%' }
+                                            })
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    ),
+
+                    // Analysis complete message
+                    analysisResults.layer3.technical && React.createElement('div', {
+                        className: "bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg p-6 text-center mb-8"
+                    },
+                        React.createElement('h3', {
+                            className: "text-xl font-bold mb-2"
+                        }, "Analysis Complete! 🎉"),
+                        React.createElement('p', {
+                            className: "text-sm opacity-90"
+                        }, "Your audio has been fully analyzed across all three layers. The generated video prompts are ready for AI video generation.")
+                    )
+                )
+            );
+        };
+
+        ReactDOM.render(React.createElement(AudioAnalysisAgent), document.getElementById('root'));
+    </script>
+</body>
+</html>

@@ -967,3 +967,806 @@ class AdvancedAudioAnalysisAgent:
             analysis["error"] = str(e)
         
         return analysis
+    
+    def _analyze_advanced_features(self, y: np.ndarray, sr: int) -> Dict[str, Any]:
+        """Advanced ML-based feature analysis"""
+        print("🤖 Advanced ML Features Analysis...")
+        
+        analysis = {}
+        
+        try:
+            # Genre Classification
+            if self.genre_classifier is not None and HAS_SKLEARN:
+                print("   → Genre Classification")
+                
+                # Extract features for genre classification
+                features = self._extract_genre_features(y, sr)
+                if features is not None:
+                    features_scaled = self.genre_scaler.transform([features])
+                    genre_probabilities = self.genre_classifier.predict_proba(features_scaled)[0]
+                    predicted_genre_idx = np.argmax(genre_probabilities)
+                    
+                    genres = ['rock', 'pop', 'classical', 'jazz', 'electronic']
+                    predicted_genre = genres[predicted_genre_idx]
+                    confidence = float(genre_probabilities[predicted_genre_idx])
+                    
+                    genre_scores = {genre: float(prob) for genre, prob in zip(genres, genre_probabilities)}
+                    
+                    analysis["genre_classification"] = {
+                        "predicted_genre": predicted_genre,
+                        "confidence": confidence,
+                        "all_scores": genre_scores,
+                        "features_used": len(features)
+                    }
+            
+            # Mood Detection
+            if self.mood_classifier is not None and HAS_SKLEARN:
+                print("   → Mood Detection")
+                
+                # Extract features for mood classification
+                mood_features = self._extract_mood_features(y, sr)
+                if mood_features is not None:
+                    mood_features_scaled = self.mood_scaler.transform([mood_features])
+                    mood_probabilities = self.mood_classifier.predict_proba(mood_features_scaled)[0]
+                    predicted_mood_idx = np.argmax(mood_probabilities)
+                    
+                    moods = ['happy', 'sad', 'energetic', 'calm', 'aggressive']
+                    predicted_mood = moods[predicted_mood_idx]
+                    mood_confidence = float(mood_probabilities[predicted_mood_idx])
+                    
+                    mood_scores = {mood: float(prob) for mood, prob in zip(moods, mood_probabilities)}
+                    
+                    analysis["mood_detection"] = {
+                        "predicted_mood": predicted_mood,
+                        "confidence": mood_confidence,
+                        "all_scores": mood_scores,
+                        "emotional_valence": self._calculate_valence(mood_scores),
+                        "energy_level": self._calculate_energy_level(mood_scores)
+                    }
+            
+            # Instrument Detection
+            print("   → Instrument Detection")
+            instrument_analysis = self._detect_instruments(y, sr)
+            analysis["instrument_detection"] = instrument_analysis
+            
+            # Audio Complexity Analysis
+            print("   → Audio Complexity Analysis")
+            complexity_analysis = self._analyze_audio_complexity(y, sr)
+            analysis["complexity_analysis"] = complexity_analysis
+            
+            # Texture and Timbre Analysis
+            print("   → Texture and Timbre Analysis")
+            texture_analysis = self._analyze_texture_timbre(y, sr)
+            analysis["texture_timbre"] = texture_analysis
+            
+            # Rhythmic Pattern Analysis
+            print("   → Rhythmic Pattern Analysis")
+            rhythm_patterns = self._analyze_rhythm_patterns(y, sr)
+            analysis["rhythm_patterns"] = rhythm_patterns
+            
+        except Exception as e:
+            analysis["error"] = str(e)
+        
+        return analysis
+    
+    def _extract_genre_features(self, y: np.ndarray, sr: int) -> Optional[List[float]]:
+        """Extract features for genre classification"""
+        try:
+            # Tempo
+            tempo, _ = librosa.beat.beat_track(y=y, sr=sr)
+            
+            # Spectral features
+            spectral_centroid = np.mean(librosa.feature.spectral_centroid(y=y, sr=sr))
+            spectral_rolloff = np.mean(librosa.feature.spectral_rolloff(y=y, sr=sr))
+            zcr = np.mean(librosa.feature.zero_crossing_rate(y))
+            
+            # MFCC
+            mfcc = librosa.feature.mfcc(y=y, sr=sr, n_mfcc=13)
+            mfcc_mean = np.mean(mfcc[0])  # First MFCC coefficient
+            
+            # Energy
+            rms = librosa.feature.rms(y=y)
+            energy = np.mean(rms)
+            
+            return [float(tempo), float(spectral_centroid), float(spectral_rolloff), 
+                   float(zcr), float(mfcc_mean), float(energy)]
+        except:
+            return None
+    
+    def _extract_mood_features(self, y: np.ndarray, sr: int) -> Optional[List[float]]:
+        """Extract features for mood classification"""
+        try:
+            # Tempo
+            tempo, _ = librosa.beat.beat_track(y=y, sr=sr)
+            
+            # Brightness (spectral centroid)
+            brightness = np.mean(librosa.feature.spectral_centroid(y=y, sr=sr))
+            
+            # Energy
+            energy = np.mean(librosa.feature.rms(y=y))
+            
+            # Valence (estimated from harmony)
+            chroma = librosa.feature.chroma_stft(y=y, sr=sr)
+            chroma_mean = np.mean(chroma, axis=1)
+            
+            # Major scale profile for valence estimation
+            major_profile = np.array([1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1])
+            valence = np.corrcoef(chroma_mean, major_profile)[0, 1]
+            valence = valence if not np.isnan(valence) else 0.5
+            
+            # Major key likelihood
+            major_correlation = valence
+            
+            return [float(tempo), float(brightness), float(energy), 
+                   float(valence), float(major_correlation)]
+        except:
+            return None
+    
+    def _calculate_valence(self, mood_scores: Dict[str, float]) -> float:
+        """Calculate emotional valence from mood scores"""
+        positive_moods = ['happy', 'energetic', 'calm']
+        negative_moods = ['sad', 'aggressive']
+        
+        positive_score = sum(mood_scores.get(mood, 0) for mood in positive_moods)
+        negative_score = sum(mood_scores.get(mood, 0) for mood in negative_moods)
+        
+        # Normalize to [-1, 1] range
+        total = positive_score + negative_score
+        if total > 0:
+            return (positive_score - negative_score) / total
+        return 0.0
+    
+    def _calculate_energy_level(self, mood_scores: Dict[str, float]) -> float:
+        """Calculate energy level from mood scores"""
+        high_energy_moods = ['energetic', 'aggressive', 'happy']
+        low_energy_moods = ['calm', 'sad']
+        
+        high_energy = sum(mood_scores.get(mood, 0) for mood in high_energy_moods)
+        low_energy = sum(mood_scores.get(mood, 0) for mood in low_energy_moods)
+        
+        total = high_energy + low_energy
+        if total > 0:
+            return high_energy / total
+        return 0.5
+    
+    def _detect_instruments(self, y: np.ndarray, sr: int) -> Dict[str, Any]:
+        """Detect likely instruments in the audio"""
+        try:
+            # Separate harmonic and percussive components
+            y_harmonic, y_percussive = librosa.effects.hpss(y)
+            
+            # Instrument detection based on spectral characteristics
+            instruments = {}
+            
+            # Drum detection (high percussive energy)
+            perc_energy = np.sum(y_percussive**2)
+            harm_energy = np.sum(y_harmonic**2)
+            total_energy = perc_energy + harm_energy
+            
+            drums_likelihood = perc_energy / total_energy if total_energy > 0 else 0
+            instruments["drums"] = {
+                "likelihood": float(drums_likelihood),
+                "confidence": "high" if drums_likelihood > 0.3 else "medium" if drums_likelihood > 0.1 else "low"
+            }
+            
+            # Piano detection (harmonic content with specific spectral profile)
+            if harm_energy > 0:
+                spectral_centroid = np.mean(librosa.feature.spectral_centroid(y=y_harmonic, sr=sr))
+                spectral_rolloff = np.mean(librosa.feature.spectral_rolloff(y=y_harmonic, sr=sr))
+                
+                # Piano typically has moderate spectral centroid and good harmonic structure
+                piano_score = 0
+                if 800 < spectral_centroid < 3000:
+                    piano_score += 0.3
+                if 2000 < spectral_rolloff < 8000:
+                    piano_score += 0.3
+                
+                # Check for harmonic structure
+                chroma = librosa.feature.chroma_stft(y=y_harmonic, sr=sr)
+                harmonic_clarity = np.max(np.mean(chroma, axis=1)) / np.mean(chroma)
+                if harmonic_clarity > 2:
+                    piano_score += 0.4
+                
+                instruments["piano"] = {
+                    "likelihood": float(piano_score),
+                    "confidence": "high" if piano_score > 0.7 else "medium" if piano_score > 0.4 else "low"
+                }
+            
+            # Guitar detection (moderate harmonic content with specific frequency characteristics)
+            if harm_energy > 0:
+                # Guitar typically has energy in specific frequency bands
+                stft = librosa.stft(y_harmonic)
+                magnitude = np.abs(stft)
+                freqs = librosa.fft_frequencies(sr=sr)
+                
+                # Guitar fundamental frequencies range
+                guitar_freq_mask = (freqs >= 80) & (freqs <= 1000)
+                guitar_energy = np.mean(magnitude[guitar_freq_mask, :]) if np.any(guitar_freq_mask) else 0
+                
+                total_spectral_energy = np.mean(magnitude)
+                guitar_ratio = guitar_energy / total_spectral_energy if total_spectral_energy > 0 else 0
+                
+                instruments["guitar"] = {
+                    "likelihood": float(min(guitar_ratio * 2, 1.0)),  # Scale and cap at 1.0
+                    "confidence": "medium"
+                }
+            
+            # Synthesizer detection (electronic characteristics)
+            spectral_flatness = np.mean(librosa.feature.spectral_flatness(y=y))
+            synth_likelihood = spectral_flatness  # High flatness suggests electronic/synthetic origin
+            
+            instruments["synthesizer"] = {
+                "likelihood": float(synth_likelihood),
+                "confidence": "high" if synth_likelihood > 0.8 else "medium" if synth_likelihood > 0.5 else "low"
+            }
+            
+            return {
+                "detected_instruments": instruments,
+                "dominant_instrument": max(instruments.items(), key=lambda x: x[1]["likelihood"])[0],
+                "harmonic_percussive_ratio": float(harm_energy / perc_energy) if perc_energy > 0 else float('inf')
+            }
+            
+        except Exception as e:
+            return {"error": str(e)}
+    
+    def _analyze_audio_complexity(self, y: np.ndarray, sr: int) -> Dict[str, Any]:
+        """Analyze overall audio complexity"""
+        try:
+            # Spectral complexity
+            stft = librosa.stft(y)
+            magnitude = np.abs(stft)
+            
+            # Spectral entropy (measure of spectral complexity)
+            spectrum = np.mean(magnitude, axis=1)
+            normalized_spectrum = spectrum / np.sum(spectrum)
+            spectral_entropy = -np.sum(normalized_spectrum * np.log2(normalized_spectrum + 1e-10))
+            
+            # Temporal complexity (rate of change)
+            spectral_centroid = librosa.feature.spectral_centroid(y=y, sr=sr)[0]
+            temporal_variation = np.std(spectral_centroid) / np.mean(spectral_centroid)
+            
+            # Harmonic complexity
+            chroma = librosa.feature.chroma_stft(y=y, sr=sr)
+            harmonic_variance = np.mean(np.var(chroma, axis=1))
+            
+            # Rhythmic complexity (onset density and regularity)
+            onset_frames = librosa.onset.onset_detect(y=y, sr=sr)
+            onset_density = len(onset_frames) / (len(y) / sr)  # onsets per second
+            
+            if len(onset_frames) > 2:
+                onset_times = librosa.frames_to_time(onset_frames, sr=sr)
+                onset_intervals = np.diff(onset_times)
+                rhythmic_regularity = 1.0 / (1.0 + np.std(onset_intervals) / np.mean(onset_intervals))
+            else:
+                rhythmic_regularity = 0
+            
+            # Overall complexity score
+            complexity_factors = [
+                ("spectral", float(spectral_entropy / 10)),  # Normalize
+                ("temporal", float(min(temporal_variation, 1.0))),
+                ("harmonic", float(min(harmonic_variance * 10, 1.0))),
+                ("rhythmic", float(1.0 - rhythmic_regularity))
+            ]
+            
+            overall_complexity = np.mean([score for _, score in complexity_factors])
+            
+            return {
+                "overall_complexity": float(overall_complexity),
+                "complexity_breakdown": dict(complexity_factors),
+                "spectral_entropy": float(spectral_entropy),
+                "temporal_variation": float(temporal_variation),
+                "harmonic_variance": float(harmonic_variance),
+                "onset_density": float(onset_density),
+                "rhythmic_regularity": float(rhythmic_regularity),
+                "complexity_level": "high" if overall_complexity > 0.7 else 
+                                 "medium" if overall_complexity > 0.4 else "low"
+            }
+            
+        except Exception as e:
+            return {"error": str(e)}
+    
+    def _analyze_texture_timbre(self, y: np.ndarray, sr: int) -> Dict[str, Any]:
+        """Analyze audio texture and timbre characteristics"""
+        try:
+            # MFCC analysis for timbre
+            mfcc = librosa.feature.mfcc(y=y, sr=sr, n_mfcc=13)
+            
+            # Timbre features
+            mfcc_mean = np.mean(mfcc, axis=1)
+            mfcc_std = np.std(mfcc, axis=1)
+            
+            # Brightness (related to spectral centroid)
+            spectral_centroid = librosa.feature.spectral_centroid(y=y, sr=sr)[0]
+            brightness = float(np.mean(spectral_centroid))
+            
+            # Roughness (spectral irregularity)
+            spectral_contrast = librosa.feature.spectral_contrast(y=y, sr=sr)
+            roughness = float(np.mean(np.std(spectral_contrast, axis=1)))
+            
+            # Warmth (low-frequency content)
+            stft = librosa.stft(y)
+            magnitude = np.abs(stft)
+            freqs = librosa.fft_frequencies(sr=sr)
+            
+            low_freq_mask = freqs <= 500
+            mid_freq_mask = (freqs > 500) & (freqs <= 4000)
+            
+            low_energy = np.mean(magnitude[low_freq_mask, :]) if np.any(low_freq_mask) else 0
+            mid_energy = np.mean(magnitude[mid_freq_mask, :]) if np.any(mid_freq_mask) else 0
+            
+            warmth = float(low_energy / (mid_energy + 1e-10))
+            
+            # Texture density (number of simultaneous events)
+            onset_frames = librosa.onset.onset_detect(y=y, sr=sr)
+            onset_density = len(onset_frames) / (len(y) / sr)
+            
+            # Spectral flux (rate of spectral change)
+            spectral_flux = np.mean(np.diff(magnitude, axis=1)**2)
+            
+            return {
+                "timbre_features": {
+                    "mfcc_coefficients": [float(x) for x in mfcc_mean[:5]],  # First 5 MFCCs
+                    "mfcc_variation": [float(x) for x in mfcc_std[:5]],
+                    "brightness": brightness,
+                    "roughness": roughness,
+                    "warmth": warmth
+                },
+                "texture_characteristics": {
+                    "density": float(onset_density),
+                    "spectral_flux": float(spectral_flux),
+                    "temporal_stability": float(1.0 / (1.0 + np.std(spectral_centroid) / np.mean(spectral_centroid)))
+                },
+                "perceptual_qualities": {
+                    "perceived_brightness": "bright" if brightness > 2000 else "moderate" if brightness > 1000 else "dark",
+                    "perceived_texture": "dense" if onset_density > 5 else "moderate" if onset_density > 2 else "sparse",
+                    "perceived_warmth": "warm" if warmth > 1.5 else "neutral" if warmth > 0.5 else "cool"
+                }
+            }
+            
+        except Exception as e:
+            return {"error": str(e)}
+    
+    def _analyze_rhythm_patterns(self, y: np.ndarray, sr: int) -> Dict[str, Any]:
+        """Analyze rhythmic patterns and groove characteristics"""
+        try:
+            # Beat tracking
+            tempo, beats = librosa.beat.beat_track(y=y, sr=sr)
+            beat_times = librosa.frames_to_time(beats, sr=sr)
+            
+            analysis = {
+                "tempo_analysis": {
+                    "estimated_tempo": float(tempo),
+                    "beats_detected": len(beats),
+                    "beat_consistency": 0
+                },
+                "groove_analysis": {},
+                "rhythmic_features": {}
+            }
+            
+            if len(beat_times) > 3:
+                # Beat consistency
+                beat_intervals = np.diff(beat_times)
+                tempo_stability = 1.0 / (1.0 + np.std(beat_intervals) / np.mean(beat_intervals))
+                analysis["tempo_analysis"]["beat_consistency"] = float(tempo_stability)
+                
+                # Groove analysis
+                # Swing detection (timing deviations)
+                expected_interval = 60.0 / tempo
+                timing_deviations = beat_intervals - expected_interval
+                swing_factor = float(np.std(timing_deviations))
+                
+                # Syncopation detection (off-beat emphasis)
+                # Analyze energy at beat positions vs off-beat positions
+                rms = librosa.feature.rms(y=y)[0]
+                
+                on_beat_energy = []
+                off_beat_energy = []
+                
+                for i, beat_time in enumerate(beat_times[:-1]):
+                    # On-beat energy
+                    beat_frame = int(beat_time * sr / 512)  # Convert to frame index
+                    if beat_frame < len(rms):
+                        on_beat_energy.append(rms[beat_frame])
+                    
+                    # Off-beat energy (halfway between beats)
+                    if i < len(beat_times) - 1:
+                        off_beat_time = beat_time + (beat_times[i+1] - beat_time) / 2
+                        off_beat_frame = int(off_beat_time * sr / 512)
+                        if off_beat_frame < len(rms):
+                            off_beat_energy.append(rms[off_beat_frame])
+                
+                if on_beat_energy and off_beat_energy:
+                    syncopation = float(np.mean(off_beat_energy) / np.mean(on_beat_energy))
+                else:
+                    syncopation = 0
+                
+                analysis["groove_analysis"] = {
+                    "swing_factor": swing_factor,
+                    "syncopation": syncopation,
+                    "groove_type": "swing" if swing_factor > 0.1 else "straight",
+                    "rhythmic_emphasis": "syncopated" if syncopation > 0.8 else "on-beat"
+                }
+                
+                # Advanced rhythmic features
+                onset_frames = librosa.onset.onset_detect(y=y, sr=sr)
+                if len(onset_frames) > 0:
+                    onset_times = librosa.frames_to_time(onset_frames, sr=sr)
+                    
+                    # Microtiming analysis
+                    if len(beat_times) > 1 and len(onset_times) > 1:
+                        # Find onsets that are close to beats
+                        beat_aligned_onsets = []
+                        for beat_time in beat_times:
+                            closest_onset_idx = np.argmin(np.abs(onset_times - beat_time))
+                            closest_onset_time = onset_times[closest_onset_idx]
+                            if abs(closest_onset_time - beat_time) < 0.1:  # Within 100ms
+                                beat_aligned_onsets.append(closest_onset_time - beat_time)
+                        
+                        if beat_aligned_onsets:
+                            microtiming_precision = float(1.0 / (1.0 + np.std(beat_aligned_onsets)))
+                        else:
+                            microtiming_precision = 0
+                    else:
+                        microtiming_precision = 0
+                    
+                    # Onset density variation
+                    onset_density_over_time = []
+                    window_size = 4.0  # 4-second windows
+                    for start_time in np.arange(0, len(y)/sr - window_size, window_size/2):
+                        end_time = start_time + window_size
+                        window_onsets = onset_times[(onset_times >= start_time) & (onset_times < end_time)]
+                        density = len(window_onsets) / window_size
+                        onset_density_over_time.append(density)
+                    
+                    density_variation = float(np.std(onset_density_over_time)) if onset_density_over_time else 0
+                    
+                    analysis["rhythmic_features"] = {
+                        "total_onsets": len(onset_times),
+                        "onset_density": float(len(onset_times) / (len(y) / sr)),
+                        "microtiming_precision": microtiming_precision,
+                        "density_variation": density_variation,
+                        "rhythmic_complexity": float(density_variation + (1.0 - microtiming_precision))
+                    }
+            
+            return analysis
+            
+        except Exception as e:
+            return {"error": str(e)}
+    
+    def _generate_summary(self, results: Dict[str, Any]) -> Dict[str, Any]:
+        """Generate a concise summary of the analysis results"""
+        summary = {
+            "file_info": {
+                "duration": results["metadata"]["duration"],
+                "sample_rate": results["metadata"]["sample_rate"]
+            }
+        }
+        
+        # Musical summary
+        if "musical_structural" in results and "rhythm" in results["musical_structural"]:
+            rhythm = results["musical_structural"]["rhythm"]
+            summary["musical"] = {
+                "tempo": rhythm.get("estimated_tempo", 0),
+                "rhythm_regularity": rhythm.get("rhythm_regularity", 0)
+            }
+            
+            if "harmony" in results["musical_structural"]:
+                harmony = results["musical_structural"]["harmony"]
+                summary["musical"].update({
+                    "key": harmony.get("estimated_key", "unknown"),
+                    "mode": harmony.get("mode", "unknown")
+                })
+        
+        # Vocal summary
+        if "lyrical_vocal" in results and "voice_activity" in results["lyrical_vocal"]:
+            voice = results["lyrical_vocal"]["voice_activity"]
+            summary["vocal"] = {
+                "has_vocals": voice.get("likely_contains_vocals", False),
+                "voice_confidence": voice.get("voice_confidence", 0)
+            }
+        
+        # Spectral summary
+        if "sonic_spectral" in results and "spectral_features" in results["sonic_spectral"]:
+            spectral = results["sonic_spectral"]["spectral_features"]
+            if "spectral_centroid" in spectral:
+                summary["spectral"] = {
+                    "brightness": spectral["spectral_centroid"].get("mean", 0),
+                    "energy": spectral.get("spectral_contrast", {}).get("mean", 0)
+                }
+        
+        # Advanced features summary
+        if "advanced_features" in results:
+            advanced = results["advanced_features"]
+            if "genre_classification" in advanced:
+                summary["genre"] = {
+                    "predicted": advanced["genre_classification"].get("predicted_genre", "unknown"),
+                    "confidence": advanced["genre_classification"].get("confidence", 0)
+                }
+            
+            if "mood_detection" in advanced:
+                summary["mood"] = {
+                    "predicted": advanced["mood_detection"].get("predicted_mood", "unknown"),
+                    "confidence": advanced["mood_detection"].get("confidence", 0),
+                    "valence": advanced["mood_detection"].get("emotional_valence", 0),
+                    "energy": advanced["mood_detection"].get("energy_level", 0)
+                }
+        
+        return summary
+    
+    def save_results(self, output_path: str, include_raw_data: bool = False) -> bool:
+        """Save analysis results to JSON file with enhanced format"""
+        try:
+            def convert_numpy_types(obj):
+                """Convert numpy types to native Python types for JSON serialization"""
+                if isinstance(obj, np.integer):
+                    return int(obj)
+                elif isinstance(obj, np.floating):
+                    return float(obj)
+                elif isinstance(obj, np.bool_):
+                    return bool(obj)
+                elif isinstance(obj, np.ndarray):
+                    return obj.tolist()
+                elif isinstance(obj, dict):
+                    return {key: convert_numpy_types(value) for key, value in obj.items()}
+                elif isinstance(obj, list):
+                    return [convert_numpy_types(item) for item in obj]
+                else:
+                    return obj
+            
+            # Prepare output data
+            output_data = {
+                "analysis_metadata": {
+                    "agent_version": "advanced",
+                    "analysis_timestamp": datetime.now().isoformat(),
+                    "features_included": list(self.results.keys()) if self.results else [],
+                    "ml_models_used": {
+                        "genre_classification": self.genre_classifier is not None,
+                        "mood_detection": self.mood_classifier is not None
+                    }
+                },
+                "analysis_results": convert_numpy_types(self.results),
+                "analysis_history": convert_numpy_types(self.analysis_history[-10:])  # Last 10 analyses
+            }
+            
+            # Add raw data if requested (for debugging/research)
+            if include_raw_data:
+                output_data["raw_features"] = {
+                    "note": "Raw feature data included for research purposes",
+                    "features": {}  # Would include raw spectral data, etc.
+                }
+            
+            with open(output_path, 'w') as f:
+                json.dump(output_data, f, indent=2, ensure_ascii=False)
+            
+            print(f"✅ Results saved to: {output_path}")
+            return True
+            
+        except Exception as e:
+            print(f"❌ Error saving results: {e}")
+            return False
+    
+    def print_summary(self, detailed: bool = False):
+        """Print a formatted summary of the analysis results"""
+        if not self.results:
+            print("❌ No analysis results available")
+            return
+        
+        print("\n" + "="*80)
+        print("🎵 ADVANCED AUDIO ANALYSIS SUMMARY")
+        print("="*80)
+        
+        # File information
+        metadata = self.results.get("metadata", {})
+        print(f"\n📁 File: {Path(metadata.get('file', 'unknown')).name}")
+        print(f"⏱️  Duration: {metadata.get('duration', 0):.2f} seconds")
+        print(f"🔊 Sample Rate: {metadata.get('sample_rate', 0)} Hz")
+        print(f"📊 Analysis Time: {metadata.get('analysis_time', 'unknown')}")
+        
+        # Musical Analysis
+        musical = self.results.get("musical_structural", {})
+        if musical:
+            print(f"\n🎼 MUSICAL ANALYSIS")
+            
+            rhythm = musical.get("rhythm", {})
+            if rhythm:
+                print(f"   Tempo: {rhythm.get('estimated_tempo', 0):.1f} BPM")
+                print(f"   Rhythm Regularity: {rhythm.get('rhythm_regularity', 0):.2f}")
+                print(f"   Beat Strength: {rhythm.get('beat_strength', 0):.3f}")
+            
+            harmony = musical.get("harmony", {})
+            if harmony:
+                print(f"   Key: {harmony.get('estimated_key', 'unknown')} {harmony.get('mode', '')}")
+                print(f"   Key Confidence: {harmony.get('key_confidence', 0):.2f}")
+                print(f"   Harmonic Complexity: {harmony.get('harmonic_complexity', 0):.3f}")
+        
+        # Vocal Analysis
+        vocal = self.results.get("lyrical_vocal", {})
+        if vocal:
+            print(f"\n🎤 VOCAL ANALYSIS")
+            
+            voice_activity = vocal.get("voice_activity", {})
+            if voice_activity:
+                has_vocals = voice_activity.get("likely_contains_vocals", False)
+                confidence = voice_activity.get("voice_confidence", 0)
+                print(f"   Contains Vocals: {'Yes' if has_vocals else 'No'} (confidence: {confidence:.2f})")
+            
+            if vocal.get("speech_recognition") and "transcribed_text" in vocal["speech_recognition"]:
+                text = vocal["speech_recognition"]["transcribed_text"]
+                print(f"   Transcribed Text: \"{text[:100]}...\" " if len(text) > 100 else f"   Transcribed Text: \"{text}\"")
+            
+            vocal_chars = vocal.get("vocal_characteristics", {})
+            if vocal_chars and "pitch_analysis" in vocal_chars:
+                pitch = vocal_chars["pitch_analysis"]
+                print(f"   Vocal Range: {pitch.get('min_pitch', 0):.1f} - {pitch.get('max_pitch', 0):.1f} Hz")
+                voice_type = vocal_chars.get("voice_classification", {}).get("estimated_type", "unknown")
+                print(f"   Voice Type: {voice_type}")
+        
+        # Spectral Analysis
+        spectral = self.results.get("sonic_spectral", {})
+        if spectral:
+            print(f"\n🔊 SPECTRAL ANALYSIS")
+            
+            features = spectral.get("spectral_features", {})
+            if features and "spectral_centroid" in features:
+                brightness = features["spectral_centroid"].get("mean", 0)
+                print(f"   Brightness: {brightness:.1f} Hz")
+            
+            quality = spectral.get("audio_quality", {})
+            if quality:
+                print(f"   Audio Quality: {quality.get('overall_quality', 'unknown')}")
+                snr = quality.get("estimated_snr_db", 0)
+                print(f"   Signal-to-Noise Ratio: {snr:.1f} dB")
+        
+        # Advanced Features
+        advanced = self.results.get("advanced_features", {})
+        if advanced:
+            print(f"\n🤖 ADVANCED ANALYSIS")
+            
+            genre = advanced.get("genre_classification", {})
+            if genre:
+                predicted_genre = genre.get("predicted_genre", "unknown")
+                confidence = genre.get("confidence", 0)
+                print(f"   Predicted Genre: {predicted_genre} (confidence: {confidence:.2f})")
+            
+            mood = advanced.get("mood_detection", {})
+            if mood:
+                predicted_mood = mood.get("predicted_mood", "unknown")
+                confidence = mood.get("confidence", 0)
+                valence = mood.get("emotional_valence", 0)
+                energy = mood.get("energy_level", 0)
+                print(f"   Predicted Mood: {predicted_mood} (confidence: {confidence:.2f})")
+                print(f"   Emotional Valence: {valence:.2f} (negative ← 0 → positive)")
+                print(f"   Energy Level: {energy:.2f} (low ← 0.5 → high)")
+            
+            instruments = advanced.get("instrument_detection", {})
+            if instruments and "detected_instruments" in instruments:
+                dominant = instruments.get("dominant_instrument", "unknown")
+                print(f"   Dominant Instrument: {dominant}")
+            
+            complexity = advanced.get("complexity_analysis", {})
+            if complexity:
+                level = complexity.get("complexity_level", "unknown")
+                score = complexity.get("overall_complexity", 0)
+                print(f"   Complexity: {level} (score: {score:.2f})")
+        
+        # Detailed analysis
+        if detailed:
+            print(f"\n📊 DETAILED METRICS")
+            
+            # Show more detailed breakdown
+            if musical and "structure" in musical:
+                structure = musical["structure"]
+                segments = structure.get("total_segments", 0)
+                complexity = structure.get("structural_complexity", 0)
+                print(f"   Structural Segments: {segments}")
+                print(f"   Structural Complexity: {complexity:.3f}")
+            
+            if advanced and "texture_timbre" in advanced:
+                texture = advanced["texture_timbre"]
+                if "perceptual_qualities" in texture:
+                    qualities = texture["perceptual_qualities"]
+                    print(f"   Perceived Brightness: {qualities.get('perceived_brightness', 'unknown')}")
+                    print(f"   Perceived Texture: {qualities.get('perceived_texture', 'unknown')}")
+                    print(f"   Perceived Warmth: {qualities.get('perceived_warmth', 'unknown')}")
+        
+        print("\n" + "="*80)
+    
+    def start_streaming(self, chunk_duration: float = 1.0):
+        """Start real-time audio streaming analysis (placeholder)"""
+        if not self.enable_streaming:
+            print("❌ Streaming not enabled. Initialize with enable_streaming=True")
+            return
+        
+        print("🎙️ Starting real-time audio analysis...")
+        print("⚠️  Note: Real-time streaming requires additional audio input setup")
+        # This would integrate with PyAudio or similar for real-time analysis
+        # Implementation would depend on specific use case
+    
+    def stop_streaming(self):
+        """Stop real-time audio streaming"""
+        if self.is_streaming:
+            self.is_streaming = False
+            print("🛑 Streaming stopped")
+    
+    def batch_analyze(self, audio_files: List[str], output_dir: str = "batch_results") -> Dict[str, Any]:
+        """Analyze multiple audio files in batch"""
+        print(f"\n🔄 Batch Analysis: {len(audio_files)} files")
+        
+        results = {}
+        os.makedirs(output_dir, exist_ok=True)
+        
+        for i, audio_path in enumerate(audio_files):
+            print(f"\n[{i+1}/{len(audio_files)}] Processing: {Path(audio_path).name}")
+            
+            try:
+                file_results = self.analyze_audio(audio_path, include_advanced=True)
+                results[audio_path] = file_results
+                
+                # Save individual results
+                output_filename = f"{Path(audio_path).stem}_analysis.json"
+                output_path = os.path.join(output_dir, output_filename)
+                
+                # Temporarily store current results
+                temp_results = self.results
+                self.results = file_results
+                self.save_results(output_path)
+                self.results = temp_results
+                
+            except Exception as e:
+                print(f"❌ Error processing {audio_path}: {e}")
+                results[audio_path] = {"error": str(e)}
+        
+        # Save batch summary
+        batch_summary = {
+            "batch_info": {
+                "total_files": len(audio_files),
+                "successful": len([r for r in results.values() if "error" not in r]),
+                "failed": len([r for r in results.values() if "error" in r]),
+                "analysis_time": datetime.now().isoformat()
+            },
+            "individual_results": results
+        }
+        
+        summary_path = os.path.join(output_dir, "batch_summary.json")
+        with open(summary_path, 'w') as f:
+            json.dump(batch_summary, f, indent=2, default=str)
+        
+        print(f"\n✅ Batch analysis complete. Results saved to: {output_dir}")
+        return batch_summary
+
+
+def main():
+    """Main function for command-line usage"""
+    import argparse
+    
+    parser = argparse.ArgumentParser(description="Advanced Multi-Dimensional Audio Analysis Agent")
+    parser.add_argument("audio_file", help="Path to audio file for analysis")
+    parser.add_argument("--output", "-o", help="Output JSON file path", default="analysis_results.json")
+    parser.add_argument("--detailed", "-d", action="store_true", help="Show detailed analysis output")
+    parser.add_argument("--no-advanced", action="store_true", help="Skip advanced ML-based analysis")
+    parser.add_argument("--sample-rate", type=int, default=22050, help="Audio sample rate")
+    parser.add_argument("--streaming", action="store_true", help="Enable streaming mode")
+    
+    args = parser.parse_args()
+    
+    # Initialize agent
+    agent = AdvancedAudioAnalysisAgent(
+        sample_rate=args.sample_rate,
+        enable_streaming=args.streaming
+    )
+    
+    # Analyze audio
+    results = agent.analyze_audio(
+        args.audio_file,
+        include_advanced=not args.no_advanced
+    )
+    
+    # Print summary
+    agent.print_summary(detailed=args.detailed)
+    
+    # Save results
+    agent.save_results(args.output)
+
+
+if __name__ == "__main__":
+    main()

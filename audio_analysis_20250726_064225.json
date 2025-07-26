@@ -1,0 +1,34 @@
+{
+  "metadata": {
+    "file": "test_audio.wav",
+    "duration": 5.0,
+    "sample_rate": 22050,
+    "samples": 110250,
+    "analysis_time": "2025-07-26T06:42:24.760953"
+  },
+  "musical_structural": {
+    "rhythm": {
+      "estimated_tempo": 293.9,
+      "onsets_detected": 25,
+      "rhythmic_regularity": 0.14123815639179074
+    },
+    "harmony": {
+      "estimated_key": "A",
+      "tonal_clarity": 3.96372652053833,
+      "harmonic_complexity": 0.23128530383110046
+    },
+    "structure": {
+      "total_segments": 1,
+      "segments": [
+        {
+          "start_time": 0.0,
+          "end_time": 4.0,
+          "mfcc_mean": -2.89143443107605
+        }
+      ]
+    }
+  },
+  "lyrical_vocal": {
+    "voice_activity": {
+      "voice_presence_ratio": 0.0,
+      "likely_contains_vocals": 

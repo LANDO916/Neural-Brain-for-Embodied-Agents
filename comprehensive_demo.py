@@ -10,6 +10,7 @@ import json
 import time
 import numpy as np
 import librosa
+import soundfile as sf
 from pathlib import Path
 from typing import List, Dict, Any
 
@@ -74,7 +75,7 @@ class ComprehensiveAudioDemo:
         classical_audio *= envelope
         
         classical_file = "demo_classical.wav"
-        librosa.output.write_wav(classical_file, classical_audio, sr)
+        sf.write(classical_file, classical_audio, sr)
         demo_files.append(classical_file)
         
         # 2. Electronic dance music style
@@ -105,7 +106,7 @@ class ComprehensiveAudioDemo:
         electronic_audio = np.tanh(electronic_audio)  # Soft clipping for electronic character
         
         electronic_file = "demo_electronic.wav"
-        librosa.output.write_wav(electronic_file, electronic_audio, sr)
+        sf.write(electronic_file, electronic_audio, sr)
         demo_files.append(electronic_file)
         
         # 3. Jazz-style piece
@@ -154,7 +155,7 @@ class ComprehensiveAudioDemo:
                 jazz_audio[note_idx_start:note_idx_end] += note_sound
         
         jazz_file = "demo_jazz.wav"
-        librosa.output.write_wav(jazz_file, jazz_audio, sr)
+        sf.write(jazz_file, jazz_audio, sr)
         demo_files.append(jazz_file)
         
         # 4. Rock-style piece
@@ -206,7 +207,7 @@ class ComprehensiveAudioDemo:
                 rock_audio[beat_idx:end_idx] += hit_sound[:end_idx-beat_idx]
         
         rock_file = "demo_rock.wav"
-        librosa.output.write_wav(rock_file, rock_audio, sr)
+        sf.write(rock_file, rock_audio, sr)
         demo_files.append(rock_file)
         
         # 5. Vocal-like demo
@@ -260,7 +261,7 @@ class ComprehensiveAudioDemo:
             vocal_audio[start_idx:end_idx] += voice_sound * voice_envelope
         
         vocal_file = "demo_vocal.wav"
-        librosa.output.write_wav(vocal_file, vocal_audio, sr)
+        sf.write(vocal_file, vocal_audio, sr)
         demo_files.append(vocal_file)
         
         self.demo_files = demo_files

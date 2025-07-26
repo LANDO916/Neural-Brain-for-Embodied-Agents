@@ -12,6 +12,7 @@ import hashlib
 import warnings
 import numpy as np
 import librosa
+import soundfile as sf
 from pathlib import Path
 from typing import Dict, List, Optional, Any, Tuple, Callable
 import concurrent.futures
@@ -654,7 +655,7 @@ class OptimizedAudioProcessor:
                 
                 # Save test file
                 test_file = f"test_audio_{i}.wav"
-                librosa.output.write_wav(test_file, y, sr)
+                sf.write(test_file, y, sr)
                 test_files.append(test_file)
         
         benchmark_results = {}

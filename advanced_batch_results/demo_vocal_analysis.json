@@ -1,0 +1,657 @@
+{
+  "analysis_metadata": {
+    "agent_version": "advanced",
+    "analysis_timestamp": "2025-07-26T08:40:16.869065",
+    "features_included": [
+      "metadata",
+      "musical_structural",
+      "lyrical_vocal",
+      "sonic_spectral",
+      "advanced_features"
+    ],
+    "ml_models_used": {
+      "genre_classification": true,
+      "mood_detection": true
+    }
+  },
+  "analysis_results": {
+    "metadata": {
+      "file": "demo_vocal.wav",
+      "duration": 8.0,
+      "sample_rate": 22050,
+      "samples": 176400,
+      "analysis_time": "2025-07-26T08:40:16.222189",
+      "agent_version": "advanced"
+    },
+    "musical_structural": {
+      "rhythm": {
+        "estimated_tempo": 381.8,
+        "tempo_confidence": 1.1875,
+        "onsets_detected": 81,
+        "rhythm_regularity": 0.7668878756117607,
+        "rhythm_complexity": 0.30397158672287183,
+        "beat_strength": 0.09810430839002268
+      },
+      "harmony": {
+        "estimated_key": "G#",
+        "key_confidence": 0.08686112612485886,
+        "mode": "minor",
+        "mode_confidence": 0.027893935848705278,
+        "tonal_clarity": 1.0423334836959839,
+        "harmonic_complexity": 0.2801755964756012,
+        "chord_changes": 2994,
+        "chromaticism": 0.017055654898285866
+      },
+      "structure": {
+        "total_segments": 0,
+        "segments": [],
+        "structural_complexity": 0.0,
+        "average_segment_duration": 0.0
+      }
+    },
+    "lyrical_vocal": {
+      "voice_activity": {
+        "voice_presence_ratio": 0.7536231884057971,
+        "voice_confidence": 0.6826086956521739,
+        "likely_contains_vocals": true,
+        "voice_quality": {
+          "spectral_centroid": 2833.772885891357,
+          "stability": 0.8029217209972034,
+          "clarity": 0.6826086956521739
+        }
+      },
+      "speech_recognition": {
+        "note": "No clear speech detected in audio"
+      },
+      "vocal_characteristics": {
+        "pitch_analysis": {
+          "min_pitch": 145.93983459472656,
+          "max_pitch": 998.6694946289062,
+          "mean_pitch": 547.7782592773438,
+          "median_pitch": 451.2945251464844,
+          "range_semitones": 33.29560295447227
+        },
+        "voice_quality": {
+          "stability": 0.7672630631618933,
+          "vibrato_rate": 0.7368421052631579,
+          "pitch_variance": 91018.6953125
+        },
+        "voice_classification": {
+          "estimated_type": "soprano",
+          "confidence": 78.39197540283203
+        },
+        "frames_analyzed": 343
+      }
+    },
+    "sonic_spectral": {
+      "spectral_features": {
+        "spectral_centroid": {
+          "mean": 2980.696461669869,
+          "std": 721.6871913695061,
+          "max": 5234.537849785603,
+          "min": 1857.131868045295,
+          "range": 3377.4059817403077
+        },
+        "spectral_rolloff": {
+          "mean": 6455.841542119565,
+          "std": 1347.857705079701,
+          "max": 10012.939453125,
+          "min": 3757.5439453125
+        },
+        "spectral_bandwidth": {
+          "mean": 2932.3145518855363,
+          "std": 319.545007438615
+        },
+        "spectral_contrast": {
+          "mean": 12.170594222522672,
+          "std": 5.046775639115923
+        },
+        "spectral_flatness": {
+          "mean": 0.08975919336080551,
+          "std": 0.06768987327814102
+        },
+        "zero_crossing_rate": {
+          "mean": 0.12332286005434782,
+          "std": 0.04862765105981994
+        }
+      },
+      "frequency_analysis": {
+        "dominant_frequency": 333.7646484375,
+        "peak_frequencies": [
+          21.533203125,
+          53.8330078125,
+          96.8994140625,
+          139.9658203125,
+          183.0322265625,
+          226.0986328125,
+          333.7646484375,
+          366.064453125,
+          398.3642578125,
+          441.4306640625
+        ],
+        "frequency_bands": {
+          "sub_bass": 23.895572662353516,
+          "bass": 25.849294662475586,
+          "low_mid": 26.413923263549805,
+          "mid": 15.16633129119873,
+          "high_mid": 5.227616786956787,
+          "presence": 3.857192039489746,
+          "brilliance": 2.5747385025024414
+        },
+        "spectral_entropy": -19.076448440551758,
+        "spectral_slope": -0.0014597082885513591
+      },
+      "dynamics": {
+        "rms_energy": {
+          "mean": 0.42752495408058167,
+          "std": 0.05955813452601433,
+          "max": 0.48376786708831787,
+          "min": 0.08338194340467453
+        },
+        "dynamic_range_db": 15.27130126953125,
+        "crest_factor": 2.3390448093414307,
+        "loudness_variation": 1.881116271018982,
+        "peaks_detected": 84,
+        "attack_decay": {
+          "average_attack_time": 0.16769967246157724,
+          "average_decay_time": 0.23219954648526078
+        }
+      },
+      "harmonic_percussive": {
+        "energy_ratios": {
+          "harmonic_ratio": 0.7015221167695029,
+          "percussive_ratio": 0.29847788323049707
+        },
+        "spectral_characteristics": {
+          "harmonic_centroid": 3194.3515445354456,
+          "percussive_centroid": 2676.422849909993,
+          "centroid_ratio": 0.8378610846663169
+        },
+        "temporal_characteristics": {
+          "harmonic_zcr": 0.1471382472826087,
+          "percussive_zcr": 0.1582710597826087,
+          "zcr_ratio": 1.075662261210827
+        }
+      },
+      "audio_quality": {
+        "estimated_snr_db": 14.287446975708008,
+        "clipping": {
+          "clipped_samples": 1426,
+          "clipping_percentage": 0.808390022675737
+        },
+        "silence": {
+          "silence_frames": 0,
+          "silence_percentage": 0.0
+        },
+        "overall_quality": "low"
+      }
+    },
+    "advanced_features": {
+      "genre_classification": {
+        "predicted_genre": "electronic",
+        "confidence": 0.42,
+        "all_scores": {
+          "rock": 0.16,
+          "pop": 0.02,
+          "classical": 0.02,
+          "jazz": 0.38,
+          "electronic": 0.42
+        },
+        "features_used": 6
+      },
+      "mood_detection": {
+        "predicted_mood": "aggressive",
+        "confidence": 1.0,
+        "all_scores": {
+          "happy": 0.0,
+          "sad": 0.0,
+          "energetic": 0.0,
+          "calm": 0.0,
+          "aggressive": 1.0
+        },
+        "emotional_valence": -1.0,
+        "energy_level": 1.0
+      },
+      "instrument_detection": {
+        "detected_instruments": {
+          "drums": {
+            "likelihood": 0.7990829348564148,
+            "confidence": "high"
+          },
+          "piano": {
+            "likelihood": 0.3,
+            "confidence": "low"
+          },
+          "guitar": {
+            "likelihood": 1.0,
+            "confidence": "medium"
+          },
+          "synthesizer": {
+            "likelihood": 0.08975919336080551,
+            "confidence": "low"
+          }
+        },
+        "dominant_instrument": "guitar",
+        "harmonic_percussive_ratio": 0.2514345943927765
+      },
+      "complexity_analysis": {
+        "overall_complexity": 0.5516023699549839,
+        "complexity_breakdown": {
+          "spectral": 0.9453554153442383,
+          "temporal": 0.24212032343783063,
+          "harmonic": 0.7858216166496277,
+          "rhythmic": 0.23311212438823925
+        },
+        "spectral_entropy": 9.453554153442383,
+        "temporal_variation": 0.24212032343783063,
+        "harmonic_variance": 0.07858216017484665,
+        "onset_density": 10.125,
+        "rhythmic_regularity": 0.7668878756117607,
+        "complexity_level": "medium"
+      },
+      "texture_timbre": {
+        "timbre_features": {
+          "mfcc_coefficients": [
+            62.68556213378906,
+            70.63194274902344,
+            0.2260092943906784,
+            -2.5951733589172363,
+            -9.856287956237793
+          ],
+          "mfcc_variation": [
+            52.88811492919922,
+            29.736448287963867,
+            26.435270309448242,
+            31.727262496948242,
+            24.937314987182617
+          ],
+          "brightness": 2980.696461669869,
+          "roughness": 4.5376332603709235,
+          "warmth": 2.721163749694824
+        },
+        "texture_characteristics": {
+          "density": 10.125,
+          "spectral_flux": 55.49552536010742,
+          "temporal_stability": 0.8050749843882181
+        },
+        "perceptual_qualities": {
+          "perceived_brightness": "bright",
+          "perceived_texture": "dense",
+          "perceived_warmth": "warm"
+        }
+      },
+      "rhythm_patterns": {
+        "tempo_analysis": {
+          "estimated_tempo": 151.99908088235293,
+          "beats_detected": 19,
+          "beat_consistency": 0.9560059572701819
+        },
+        "groove_analysis": {
+          "swing_factor": 0.01810597745019028,
+          "syncopation": 0.9802062511444092,
+          "groove_type": "straight",
+          "rhythmic_emphasis": "syncopated"
+        },
+        "rhythmic_features": {
+          "total_onsets": 81,
+          "onset_density": 10.125,
+          "microtiming_precision": 0.9811925650464021,
+          "density_variation": 0.0,
+          "rhythmic_complexity": 0.018807434953597935
+        }
+      }
+    }
+  },
+  "analysis_history": [
+    {
+      "timestamp": "2025-07-26T08:40:11.180632",
+      "file": "demo_classical.wav",
+      "duration": 8.0,
+      "summary": {
+        "file_info": {
+          "duration": 8.0,
+          "sample_rate": 22050
+        },
+        "musical": {
+          "tempo": 0,
+          "rhythm_regularity": 0.0,
+          "key": "C",
+          "mode": "major"
+        },
+        "vocal": {
+          "has_vocals": false,
+          "voice_confidence": 0.0
+        },
+        "spectral": {
+          "brightness": 341.4654005725279,
+          "energy": 21.07032948834832
+        },
+        "genre": {
+          "predicted": "classical",
+          "confidence": 0.84
+        },
+        "mood": {
+          "predicted": "sad",
+          "confidence": 0.8333333333333334,
+          "valence": -0.6666666666666667,
+          "energy": 0.1
+        }
+      }
+    },
+    {
+      "timestamp": "2025-07-26T08:40:11.778031",
+      "file": "demo_electronic.wav",
+      "duration": 8.0,
+      "summary": {
+        "file_info": {
+          "duration": 8.0,
+          "sample_rate": 22050
+        },
+        "musical": {
+          "tempo": 176.6,
+          "rhythm_regularity": 0.6220970164717148,
+          "key": "F#",
+          "mode": "minor"
+        },
+        "vocal": {
+          "has_vocals": true,
+          "voice_confidence": 0.47753623188405797
+        },
+        "spectral": {
+          "brightness": 1740.1197782407562,
+          "energy": 22.53328951836557
+        },
+        "genre": {
+          "predicted": "rock",
+          "confidence": 0.48
+        },
+        "mood": {
+          "predicted": "sad",
+          "confidence": 0.5333333333333333,
+          "valence": -0.3333333333333333,
+          "energy": 0.3333333333333333
+        }
+      }
+    },
+    {
+      "timestamp": "2025-07-26T08:40:12.403253",
+      "file": "demo_jazz.wav",
+      "duration": 8.0,
+      "summary": {
+        "file_info": {
+          "duration": 8.0,
+          "sample_rate": 22050
+        },
+        "musical": {
+          "tempo": 168.1,
+          "rhythm_regularity": 0.6238595440720969,
+          "key": "G",
+          "mode": "major"
+        },
+        "vocal": {
+          "has_vocals": false,
+          "voice_confidence": 0.005072463768115942
+        },
+        "spectral": {
+          "brightness": 427.68570693504705,
+          "energy": 18.60458208205139
+        },
+        "genre": {
+          "predicted": "classical",
+          "confidence": 0.78
+        },
+        "mood": {
+          "predicted": "calm",
+          "confidence": 0.36666666666666664,
+          "valence": 0.5333333333333332,
+          "energy": 0.43333333333333335
+        }
+      }
+    },
+    {
+      "timestamp": "2025-07-26T08:40:12.992617",
+      "file": "demo_rock.wav",
+      "duration": 8.0,
+      "summary": {
+        "file_info": {
+          "duration": 8.0,
+          "sample_rate": 22050
+        },
+        "musical": {
+          "tempo": 118.6,
+          "rhythm_regularity": 0.9775734194617662,
+          "key": "A",
+          "mode": "major"
+        },
+        "vocal": {
+          "has_vocals": false,
+          "voice_confidence": 0.17101449275362318
+        },
+        "spectral": {
+          "brightness": 1314.322238868303,
+          "energy": 36.1791501692928
+        },
+        "genre": {
+          "predicted": "classical",
+          "confidence": 0.7
+        },
+        "mood": {
+          "predicted": "aggressive",
+          "confidence": 0.4,
+          "valence": -0.1333333333333333,
+          "energy": 0.5666666666666667
+        }
+      }
+    },
+    {
+      "timestamp": "2025-07-26T08:40:13.668027",
+      "file": "demo_vocal.wav",
+      "duration": 8.0,
+      "summary": {
+        "file_info": {
+          "duration": 8.0,
+          "sample_rate": 22050
+        },
+        "musical": {
+          "tempo": 381.8,
+          "rhythm_regularity": 0.7668878756117607,
+          "key": "G#",
+          "mode": "minor"
+        },
+        "vocal": {
+          "has_vocals": true,
+          "voice_confidence": 0.6826086956521739
+        },
+        "spectral": {
+          "brightness": 2980.696461669869,
+          "energy": 12.170594222522672
+        },
+        "genre": {
+          "predicted": "electronic",
+          "confidence": 0.42
+        },
+        "mood": {
+          "predicted": "aggressive",
+          "confidence": 1.0,
+          "valence": -1.0,
+          "energy": 1.0
+        }
+      }
+    },
+    {
+      "timestamp": "2025-07-26T08:40:14.305455",
+      "file": "demo_classical.wav",
+      "duration": 8.0,
+      "summary": {
+        "file_info": {
+          "duration": 8.0,
+          "sample_rate": 22050
+        },
+        "musical": {
+          "tempo": 0,
+          "rhythm_regularity": 0.0,
+          "key": "C",
+          "mode": "major"
+        },
+        "vocal": {
+          "has_vocals": false,
+          "voice_confidence": 0.0
+        },
+        "spectral": {
+          "brightness": 341.4654005725279,
+          "energy": 21.07032948834832
+        },
+        "genre": {
+          "predicted": "classical",
+          "confidence": 0.84
+        },
+        "mood": {
+          "predicted": "sad",
+          "confidence": 0.8333333333333334,
+          "valence": -0.6666666666666667,
+          "energy": 0.1
+        }
+      }
+    },
+    {
+      "timestamp": "2025-07-26T08:40:14.976075",
+      "file": "demo_electronic.wav",
+      "duration": 8.0,
+      "summary": {
+        "file_info": {
+          "duration": 8.0,
+          "sample_rate": 22050
+        },
+        "musical": {
+          "tempo": 176.6,
+          "rhythm_regularity": 0.6220970164717148,
+          "key": "F#",
+          "mode": "minor"
+        },
+        "vocal": {
+          "has_vocals": true,
+          "voice_confidence": 0.47753623188405797
+        },
+        "spectral": {
+          "brightness": 1740.1197782407562,
+          "energy": 22.53328951836557
+        },
+        "genre": {
+          "predicted": "rock",
+          "confidence": 0.48
+        },
+        "mood": {
+          "predicted": "sad",
+          "confidence": 0.5333333333333333,
+          "valence": -0.3333333333333333,
+          "energy": 0.3333333333333333
+        }
+      }
+    },
+    {
+      "timestamp": "2025-07-26T08:40:15.633211",
+      "file": "demo_jazz.wav",
+      "duration": 8.0,
+      "summary": {
+        "file_info": {
+          "duration": 8.0,
+          "sample_rate": 22050
+        },
+        "musical": {
+          "tempo": 168.1,
+          "rhythm_regularity": 0.6238595440720969,
+          "key": "G",
+          "mode": "major"
+        },
+        "vocal": {
+          "has_vocals": false,
+          "voice_confidence": 0.005072463768115942
+        },
+        "spectral": {
+          "brightness": 427.68570693504705,
+          "energy": 18.60458208205139
+        },
+        "genre": {
+          "predicted": "classical",
+          "confidence": 0.78
+        },
+        "mood": {
+          "predicted": "calm",
+          "confidence": 0.36666666666666664,
+          "valence": 0.5333333333333332,
+          "energy": 0.43333333333333335
+        }
+      }
+    },
+    {
+      "timestamp": "2025-07-26T08:40:16.219892",
+      "file": "demo_rock.wav",
+      "duration": 8.0,
+      "summary": {
+        "file_info": {
+          "duration": 8.0,
+          "sample_rate": 22050
+        },
+        "musical": {
+          "tempo": 118.6,
+          "rhythm_regularity": 0.9775734194617662,
+          "key": "A",
+          "mode": "major"
+        },
+        "vocal": {
+          "has_vocals": false,
+          "voice_confidence": 0.17101449275362318
+        },
+        "spectral": {
+          "brightness": 1314.322238868303,
+          "energy": 36.1791501692928
+        },
+        "genre": {
+          "predicted": "classical",
+          "confidence": 0.7
+        },
+        "mood": {
+          "predicted": "aggressive",
+          "confidence": 0.4,
+          "valence": -0.1333333333333333,
+          "energy": 0.5666666666666667
+        }
+      }
+    },
+    {
+      "timestamp": "2025-07-26T08:40:16.868954",
+      "file": "demo_vocal.wav",
+      "duration": 8.0,
+      "summary": {
+        "file_info": {
+          "duration": 8.0,
+          "sample_rate": 22050
+        },
+        "musical": {
+          "tempo": 381.8,
+          "rhythm_regularity": 0.7668878756117607,
+          "key": "G#",
+          "mode": "minor"
+        },
+        "vocal": {
+          "has_vocals": true,
+          "voice_confidence": 0.6826086956521739
+        },
+        "spectral": {
+          "brightness": 2980.696461669869,
+          "energy": 12.170594222522672
+        },
+        "genre": {
+          "predicted": "electronic",
+          "confidence": 0.42
+        },
+        "mood": {
+          "predicted": "aggressive",
+          "confidence": 1.0,
+          "valence": -1.0,
+          "energy": 1.0
+        }
+      }
+    }
+  ]
+}

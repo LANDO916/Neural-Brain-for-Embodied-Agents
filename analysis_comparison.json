@@ -1,0 +1,67 @@
+{
+  "demo_classical.wav": {
+    "basic": {
+      "tempo": 0,
+      "key": "C",
+      "has_vocals": "False"
+    },
+    "advanced": {
+      "predicted_genre": "classical",
+      "predicted_mood": "sad",
+      "complexity": "low",
+      "dominant_instrument": "guitar"
+    }
+  },
+  "demo_electronic.wav": {
+    "basic": {
+      "tempo": 224.0,
+      "key": "F#",
+      "has_vocals": "False"
+    },
+    "advanced": {
+      "predicted_genre": "rock",
+      "predicted_mood": "sad",
+      "complexity": "high",
+      "dominant_instrument": "guitar"
+    }
+  },
+  "demo_jazz.wav": {
+    "basic": {
+      "tempo": 218.7,
+      "key": "G",
+      "has_vocals": "False"
+    },
+    "advanced": {
+      "predicted_genre": "classical",
+      "predicted_mood": "calm",
+      "complexity": "medium",
+      "dominant_instrument": "guitar"
+    }
+  },
+  "demo_rock.wav": {
+    "basic": {
+      "tempo": 119.8,
+      "key": "A",
+      "has_vocals": "False"
+    },
+    "advanced": {
+      "predicted_genre": "classical",
+      "predicted_mood": "aggressive",
+      "complexity": "medium",
+      "dominant_instrument": "guitar"
+    }
+  },
+  "demo_vocal.wav": {
+    "basic": {
+      "tempo": 611.6,
+      "key": "G#",
+      "has_vocals": "True"
+    },
+    "advanced": {
+      "predicted_genre": "electronic",
+      "predicted_mood": "aggressive",
+      "complexity": "medium",
+      "dominant_instrument": "guitar"
+    }
+  }
+}

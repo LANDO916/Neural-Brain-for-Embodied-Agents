@@ -1,0 +1,80 @@
+{
+  "files": {
+    "e2e11980b55d4c2f96c3151bce1268f2_389ff0bf594b8e8834efd5c6dbfcf39e": {
+      "filepath": "demo_classical.wav",
+      "size_mb": 0.0009365081787109375,
+      "created": "2025-07-26T08:40:21.233366",
+      "last_accessed": "2025-07-26T08:40:21.233374",
+      "analysis_params": {
+        "sample_rate": 22050,
+        "feature_groups": [
+          "spectral",
+          "temporal",
+          "harmonic",
+          "rhythmic"
+        ]
+      }
+    },
+    "5b43aadde7b5575d54f11cf7f1df4e8a_389ff0bf594b8e8834efd5c6dbfcf39e": {
+      "filepath": "demo_electronic.wav",
+      "size_mb": 0.0009794235229492188,
+      "created": "2025-07-26T08:40:21.647783",
+      "last_accessed": "2025-07-26T08:40:21.647790",
+      "analysis_params": {
+        "sample_rate": 22050,
+        "feature_groups": [
+          "spectral",
+          "temporal",
+          "harmonic",
+          "rhythmic"
+        ]
+      }
+    },
+    "39ebdb2e61f850738313a5234730160e_389ff0bf594b8e8834efd5c6dbfcf39e": {
+      "filepath": "demo_jazz.wav",
+      "size_mb": 0.000972747802734375,
+      "created": "2025-07-26T08:40:22.016477",
+      "last_accessed": "2025-07-26T08:40:22.016484",
+      "analysis_params": {
+        "sample_rate": 22050,
+        "feature_groups": [
+          "spectral",
+          "temporal",
+          "harmonic",
+          "rhythmic"
+        ]
+      }
+    },
+    "839c88da813f62a850a66747fbb051ef_389ff0bf594b8e8834efd5c6dbfcf39e": {
+      "filepath": "demo_rock.wav",
+      "size_mb": 0.000972747802734375,
+      "created": "2025-07-26T08:40:22.342161",
+      "last_accessed": "2025-07-26T08:40:22.342168",
+      "analysis_params": {
+        "sample_rate": 22050,
+        "feature_groups": [
+          "spectral",
+          "temporal",
+          "harmonic",
+          "rhythmic"
+        ]
+      }
+    },
+    "e61da033f4584260e77fb802c169ff9a_389ff0bf594b8e8834efd5c6dbfcf39e": {
+      "filepath": "demo_vocal.wav",
+      "size_mb": 0.0009746551513671875,
+      "created": "2025-07-26T08:40:22.725938",
+      "last_accessed": "2025-07-26T08:40:22.725945",
+      "analysis_params": {
+        "sample_rate": 22050,
+        "feature_groups": [
+          "spectral",
+          "temporal",
+          "harmonic",
+          "rhythmic"
+        ]
+      }
+    }
+  },
+  "total_size": 0.004836082458496094
+}

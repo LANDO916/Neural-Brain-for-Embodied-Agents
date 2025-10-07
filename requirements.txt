@@ -1,0 +1,58 @@
+# Audio Analysis and Processing
+librosa>=0.10.0
+soundfile>=0.12.1
+madmom>=0.16.1
+pyaudioanalysis>=0.3.14
+
+# Speech Recognition and Transcription (Free/Open Source)
+SpeechRecognition>=3.10.0
+vosk>=0.3.45
+faster-whisper>=0.9.0
+
+# Machine Learning and Scientific Computing
+numpy>=1.24.0
+scipy>=1.10.0
+scikit-learn>=1.3.0
+tensorflow>=2.13.0
+torch>=2.0.0
+torchaudio>=2.0.0
+
+# Audio Feature Extraction and Analysis
+pyworld>=0.3.2
+pydub>=0.25.1
+aubio>=0.4.9
+
+# Text Processing and NLP
+nltk>=3.8
+textblob>=0.17.1
+spacy>=3.6.0
+
+# Visualization and Plotting
+matplotlib>=3.7.0
+seaborn>=0.12.0
+plotly>=5.14.0
+
+# Data Handling
+pandas>=2.0.0
+xarray>=2023.1.0
+
+# Audio I/O and Format Support
+audioread>=3.0.0
+mutagen>=1.46.0
+
+# Real-time Audio Processing
+pyaudio>=0.2.11
+python-rtmidi>=1.5.8
+
+# Web Interface (Optional)
+flask>=2.3.0
+websockets>=11.0
+
+# Parallel Processing
+joblib>=1.3.0
+multiprocessing-logging>=0.3.4
+
+# Configuration and Utilities
+pyyaml>=6.0
+tqdm>=4.65.0
+click>=8.1.0

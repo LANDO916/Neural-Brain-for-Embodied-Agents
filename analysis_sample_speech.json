@@ -1,0 +1,99 @@
+{
+  "metadata": {
+    "file": "sample_speech.wav",
+    "duration": 5.0,
+    "sample_rate": 22050,
+    "samples": 110250,
+    "analysis_time": "2025-07-26T06:45:17.718526"
+  },
+  "musical_structural": {
+    "rhythm": {
+      "estimated_tempo": 85.7,
+      "onsets_detected": 8,
+      "rhythmic_regularity": 0.5849833721630565
+    },
+    "harmony": {
+      "estimated_key": "D",
+      "tonal_clarity": 2.8406972885131836,
+      "harmonic_complexity": 0.24619093537330627
+    },
+    "structure": {
+      "total_segments": 1,
+      "segments": [
+        {
+          "start_time": 0.0,
+          "end_time": 4.0,
+          "mfcc_mean": 0.9923506379127502
+        }
+      ]
+    }
+  },
+  "lyrical_vocal": {
+    "voice_activity": {
+      "voice_presence_ratio": 0.009259259259259259,
+      "likely_contains_vocals": false,
+      "mean_spectral_centroid": 3969.7245551841042,
+      "mean_spectral_rolloff": 8567.822265625
+    },
+    "speech_recognition": {
+      "note": "Voice activity too low or speech libraries not available"
+    }
+  },
+  "sonic_spectral": {
+    "spectral_features": {
+      "spectral_centroid": {
+        "mean": 3969.7245551841042,
+        "std": 212.73843776151804,
+        "max": 4364.733613746156,
+        "min": 3097.4454554681397
+      },
+      "spectral_rolloff": {
+        "mean": 8567.822265625,
+        "std": 203.71541779986893
+      },
+      "spectral_bandwidth": {
+        "mean": 3448.0872137361353,
+        "std": 44.75320534709816
+      },
+      "zero_crossing_rate": {
+        "mean": 0.10986554181134259,
+        "std": 0.015399470668404885
+      }
+    },
+    "frequency_analysis": {
+      "dominant_frequency": 150.0,
+      "prominent_frequencies": [
+        145.0,
+        150.0,
+        155.0,
+        400.0,
+        500.0,
+        800.0,
+        1000.0,
+        1200.0,
+        2000.0,
+        2300.0
+      ],
+      "frequency_range": {
+        "min": 0.0,
+        "max": 11025.0
+      }
+    },
+    "dynamics": {
+      "rms_energy": {
+        "mean": 0.2896121144294739,
+        "std": 0.034112658351659775,
+        "max": 0.33794838190078735,
+        "min": 0.18571987748146057
+      },
+      "dynamic_range_db": 5.1998395919799805,
+      "loudness_variability": 0.034112658351659775
+    },
+    "harmonic_percussive": {
+      "harmonic_ratio": 0.9871630072593689,
+      "percussive_ratio": 0.012836976908147335,
+      "harmonic_energy": 9074.11328125,
+      "percussive_energy": 117.99893188476562
+    }
+  }
+}
